@@ -1,0 +1,40 @@
+{
+  "name": "tymfrontiers-cdn/php-otp",
+  "description": "PHP: OTP Service",
+  "keywords": ["php","frontiers", "otp"],
+  "homepage": "https://github.com/tymfrontiers-cdn/php-otp",
+  "type": "library",
+  "license": "MIT",
+  "authors": [
+      {
+          "name": "Sir Louis",
+          "email": "me@sirlouis.io",
+          "homepage": "https://sirlouis.io",
+          "role": "developer"
+      },
+      {
+          "name": "Tym Frontiers Ltd",
+          "email": "git@tymfrontiers.com",
+          "homepage": "https://tymfrontiers.com",
+          "role": "developer"
+      }
+  ],
+  "require": {
+    "php" : ">=7.0",
+    "tymfrontiers-cdn/php-data" : ">=0.1@stable",
+    "tymfrontiers-cdn/php-instance-error" : ">=0.1@stable",
+    "tymfrontiers-cdn/php-validator" : ">=0.1@stable",
+    "tymfrontiers-cdn/php-generic" : ">=0.1@stable",
+    "tymfrontiers-cdn/php-multiform" : ">=0.1@stable",
+    "mailgun/mailgun-php": ">=2.8@stable",
+    "kriswallsmith/buzz": ">=1.0@stable",
+    "nyholm/psr7": ">=1.2@stable",
+    "twilio/sdk": ">=5.1@stable"
+  },
+  "require-dev": {},
+  "autoload": {
+      "psr-4": {
+          "TymFrontiers\\OTP\\": "src/"
+      }
+  }
+}
