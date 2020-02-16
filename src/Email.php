@@ -4,6 +4,7 @@ use \Mailgun\Mailgun,
     \TymFrontiers\Data,
     \TymFrontiers\Generic,
     \TymFrontiers\InstanceError,
+    \TymFrontiers\MySQLDatabase,
     \TymFrontiers\MultiForm;
 
 class Email{
@@ -131,10 +132,6 @@ class Email{
       ->findBySql("SELECT *
         FROM :db:.:tbl:
         WHERE ref='{$database->escapeValue($ref)}'
-        AND (
-          expiry IS NULL
-          OR expiry >= NOW()
-        )
         LIMIT 1")){
       $this->errors["resend"][] = [
         7, 256, "No valid OTP record found for given [ref].",
@@ -158,6 +155,24 @@ class Email{
         \strpos($result->getId(), self::$_mg_api_domain) !== false
       ){
         // $otp_qid = $result->getId();
+        // update expiry
+        if (!empty($otp->expiry) && \strtotime($otp->expiry) < \strtotime("+ 2 Hours", \time())) {
+          $otp_expiry = \strtotime("+2 Hours", \time());
+          $otp_expiry = \strftime("%Y-%m-%d %H:%M:%S",$otp_expiry);
+          // change to developer mysql account and update
+          if (!\defined("MYSQL_DEVELOPER_USERNAME")) {
+            $this->errors['resend'][] = [
+              7, 256, "MYSQL_DEVELOPER_USERNAME/MYSQL_DEVELOPER_PASS not defined.", __FILE__, __LINE__
+            ];
+            return false;
+          }
+          $conn = new MySQLDatabase(MYSQL_SERVER, MYSQL_DEVELOPER_USERNAME, MYSQL_DEVELOPER_PASS);
+          if ($conn) {
+            $log_db = MYSQL_LOG_DB;
+            return $conn->query("UPDATE `{$log_db}`.`otp_email` SET expiry = '{$conn->escapeValue($otp_expiry)}' WHERE id={$otp->id} LIMIT 1");
+          }
+          return false;
+        }
       }
     } catch (\Exception $e) {
       $this->errors['resend'][] = [
