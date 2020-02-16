@@ -28,7 +28,7 @@ class Email{
     if (!empty($sender_url) && !$url = \filter_var($sender_url, FILTER_VALIDATE_URL)) {
       throw new \Exception("Kindly provide URL where your recipient can learn more about you.", 1);
     }
-    $this->sender_url = $url;
+    if (!empty($sender_url)) $this->sender_url = $url;
   }
 
   protected function _prep_email_info (string $prop, string $email) {
