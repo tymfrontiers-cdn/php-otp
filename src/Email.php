@@ -44,6 +44,7 @@ class Email{
     $otp_code = Data::uniqueRand('', $code_len, $code_variant, false);
     $otp_ref = Data::uniqueRand('', 16, Data::RAND_MIXED_LOWER);
     $otp_qid = NULL;
+    $data = new Data;
     $otp_expiry = $expiry > 0
       ? $expiry
       : \strtotime("+2 Days", \time());
@@ -51,7 +52,7 @@ class Email{
     $greeting = !empty($this->receiver['name'])
       ? ("Hello " . \explode(' ', $this->receiver['name'])[0] . ",")
       : "Hello there,";
-    $subject = "[Secrete]: One Time Password";
+    $subject = "[SECRET] One Time Password";
     $message = "<html><div style=\"max-width: 500px; min-width:380px; margin: 0 auto; padding: 12px;\"><p>{$greeting}</p>";
       $message .= "<p style=\"margin-top:5px; margin-bottom:5px\"> <span style=\"background-color:#e4e4e4; border: solid 1px #cbcbcb; padding: 8px; margin-right: 3px; color:#000; letter-spacing: 4px; font-size: 1.5em; font-family: 'Courier New', Monospace; font-weight: bold; border-radius: 3px; -moz-border-radius: 3px; -webkit-border-radius: 3px; \">{$data->charSplit($otp_code,4)}</span> is your OTP Code.</p>";
       if (!empty($custom_message)) {
