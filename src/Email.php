@@ -54,7 +54,7 @@ class Email{
       : "Hello there,";
     $subject = "[SECRET] One Time Password";
     $message = "<html><div style=\"max-width: 500px; min-width:380px; margin: 0 auto; padding: 12px;\"><p>{$greeting}</p>";
-      $message .= "<p style=\"margin-top:5px; margin-bottom:5px\"> <span style=\"background-color:#e4e4e4; border: solid 1px #cbcbcb; padding: 8px; margin-right: 3px; color:#000; letter-spacing: 4px; font-size: 1.5em; font-family: 'Courier New', Monospace; font-weight: bold; border-radius: 3px; -moz-border-radius: 3px; -webkit-border-radius: 3px; \">{$data->charSplit($otp_code,4)}</span> is your OTP Code.</p>";
+      $message .= "<p style=\"margin-top:5px; margin-bottom:5px\"> <span style=\"background-color:#e4e4e4; border: solid 1px #cbcbcb; padding: 8px; margin-right: 3px; color:#000; letter-spacing: 4px; font-size: 1.5em; font-family: 'Courier New', Monospace; font-weight: bold; border-radius: 3px; -moz-border-radius: 3px; -webkit-border-radius: 3px; \">{$data->charSplit($otp_code,($code_len <= 6 ? 3 : 4), " ")}</span> is your OTP Code.</p>";
       if (!empty($custom_message)) {
         $message .= ("<p>" . \strip_tags($custom_message, "<br>") ."</p>");
       }
