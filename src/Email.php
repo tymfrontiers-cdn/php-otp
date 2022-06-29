@@ -2,6 +2,7 @@
 namespace TymFrontiers\OTP;
 use \Mailgun\Mailgun,
     \TymFrontiers\Data,
+    \TymFrontiers\BetaTym,
     \TymFrontiers\Generic,
     \TymFrontiers\InstanceError,
     \TymFrontiers\MySQLDatabase,
@@ -48,19 +49,22 @@ class Email{
     $otp_expiry = $expiry > 0
       ? $expiry
       : \strtotime("+2 Days", \time());
-    $otp_expiry = \strftime("%Y-%m-%d %H:%M:%S",$otp_expiry);
+    $otp_expiry = \date(BetaTym::MYSQL_DATETIME_STRING, $otp_expiry);
     $greeting = !empty($this->receiver['name'])
       ? ("Hello " . \explode(' ', $this->receiver['name'])[0] . ",")
-      : "Hello there,";
+      : "Hello there, your OTP Code is: <br><br>";
     $subject = "[SECRET] One Time Password";
     $message = "<html><div style=\"max-width: 500px; min-width:380px; margin: 0 auto; padding: 12px;\"><p>{$greeting}</p>";
-      $message .= "<p style=\"margin-top:5px; margin-bottom:5px\"> <span style=\"background-color:#e4e4e4; border: solid 1px #cbcbcb; padding: 8px; margin-right: 3px; color:#000; letter-spacing: 4px; font-size: 1.5em; font-family: 'Courier New', Monospace; font-weight: bold; border-radius: 3px; -moz-border-radius: 3px; -webkit-border-radius: 3px; \">{$data->charSplit($otp_code,($code_len <= 6 ? 3 : 4), " ")}</span> is your OTP Code.</p>";
+      $message .= "<p style=\"margin-top:5px; margin-bottom:5px\"> <span style=\"background-color:#e4e4e4; border: solid 1px #cbcbcb; padding: 8px; margin-right: 3px; color:#000; letter-spacing: 4px; font-size: 1.5em; font-family: 'Courier New', Monospace; font-weight: bold; border-radius: 3px; -moz-border-radius: 3px; -webkit-border-radius: 3px; \">{$data->charSplit($otp_code,($code_len <= 6 ? 3 : 4), " ")}</span></p>";
       if (!empty($custom_message)) {
         $message .= ("<p>" . \strip_tags($custom_message, "<br>") ."</p>");
       }
-      $message .= "<p>[NOTE]: DO NOT SHARE THIS MESSAGE OR ITS CONTENTS WITH ANYONE, YOU WILL BE AT YOUR OWN RISK!</p>";
+      $message .= "<br> <br> <p>DO NOT SHARE THIS MESSAGE OR ITS CONTENTS WITH ANYONE, YOU WILL BE AT YOUR OWN RISK!</p>";
       $message .= "<p>For more info visit: {$this->sender_url}</p>";
     $message .= "</div></html>";
+    if (\function_exists("\\email_temp")) {
+      $message = \email_temp($message);
+    }
     $message_text = "{$otp_code} is your OTP code.";
     // send message
     $mgClient = Mailgun::create(self::$_mg_api_key);
@@ -159,7 +163,7 @@ class Email{
         // update expiry
         if (!empty($otp->expiry) && \strtotime($otp->expiry) < \strtotime("+ 2 Hours", \time())) {
           $otp_expiry = \strtotime("+2 Hours", \time());
-          $otp_expiry = \strftime("%Y-%m-%d %H:%M:%S",$otp_expiry);
+          $otp_expiry = \date(BetaTym::MYSQL_DATETIME_STRING, $otp_expiry);
           // change to developer mysql account and update
           if (!\defined("MYSQL_DEVELOPER_USERNAME")) {
             $this->errors['resend'][] = [
